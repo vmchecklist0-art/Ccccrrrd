@@ -118,6 +118,7 @@ textarea {
 
 input[type=range] {
   -webkit-appearance: none;
+  appearance: none;
   background-color: transparent;
 }
 input[type=range]::-ms-track {
@@ -128,6 +129,7 @@ input[type=range]::-ms-track {
 }
 input[type=range]::-webkit-slider-thumb {
   -webkit-appearance: none;
+  appearance: none;
 }
 
 ::moz-focus-inner {
@@ -445,4 +447,237 @@ input[type=range]::-webkit-slider-thumb {
 }
 .modal__close:hover {
   opacity: 1;
+}
+
+/* Card Styles */
+.card {
+  position: relative;
+  width: calc(100% - 1rem);
+  display: flex;
+  flex-direction: column;
+  margin-left: 1rem;
+  margin-top: 1rem;
+  border-radius: 12px;
+  background-color: white;
+  box-shadow: 0 2px 8px rgba(61, 83, 88, 0.15);
+  overflow: hidden;
+  transition: all 300ms ease-out;
+  transform-origin: 10% 50%;
+  z-index: 1;
+}
+.card:hover {
+  box-shadow: 0 4px 16px rgba(61, 83, 88, 0.25);
+  transform: translateY(-2px);
+}
+@media (min-width: 600px) {
+  .card {
+    width: calc(100% / 2 - 1rem);
+  }
+}
+@media (min-width: 800px) {
+  .card {
+    width: calc(100% / 3 - 1rem);
+  }
+}
+
+.card-move {
+  transition: all 600ms ease-in-out 50ms;
+}
+.card-enter-active {
+  transition: all 300ms ease-out;
+}
+.card-leave-active {
+  transition: all 200ms ease-in;
+  position: absolute;
+  z-index: 0;
+}
+.card-enter, .card-leave-to {
+  opacity: 0;
+}
+.card-enter {
+  transform: scale(0.9);
+}
+
+.card__header {
+  padding: 1.25rem 1rem;
+  background: linear-gradient(135deg, #46d2c4 0%, #379a93 100%);
+  color: white;
+}
+
+.card__title {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+}
+
+.card__subtitle {
+  margin: 0;
+  font-size: 0.9rem;
+  font-weight: 300;
+  opacity: 0.9;
+}
+
+.card__gallery-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.card__gallery-preview {
+  position: relative;
+  width: 100%;
+  height: 250px;
+  overflow: hidden;
+  cursor: pointer;
+  background-color: #f5f5f5;
+}
+
+.gallery__preview-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 300ms ease-out;
+}
+
+.card__gallery-preview:hover .gallery__preview-image {
+  transform: scale(1.08);
+}
+
+.gallery__count-badge {
+  position: absolute;
+  bottom: 0.75rem;
+  left: 0.75rem;
+  background-color: rgba(70, 210, 196, 0.95);
+  color: white;
+  font-weight: 700;
+  font-size: 1.1rem;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.gallery__overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0);
+  transition: all 300ms ease-out;
+  cursor: pointer;
+}
+
+.card__gallery-preview:hover .gallery__overlay {
+  background-color: rgba(0, 0, 0, 0.2);
+}
+
+.card__gallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 0.5rem;
+  padding: 1rem;
+  background-color: #f5f5f5;
+  min-height: 150px;
+}
+
+.gallery__item {
+  display: block;
+  cursor: pointer;
+  border-radius: 8px;
+  overflow: hidden;
+  transition: all 200ms ease-out;
+  border: 2px solid transparent;
+}
+
+.gallery__item:hover {
+  border-color: #46d2c4;
+  transform: scale(1.05);
+}
+
+.gallery__image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.card__details {
+  display: flex;
+  justify-content: space-between;
+  padding: 1rem;
+  gap: 1rem;
+  border-top: 1px solid #e0e0e0;
+}
+
+.card__details-left {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  flex: 1;
+}
+
+.card__details-right {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  flex: 0 0 auto;
+  text-align: right;
+}
+
+.card__data {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.4;
+}
+
+.card__distance {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.4;
+}
+
+.card__label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #999;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 0.25rem;
+}
+
+.card__route,
+.card__location {
+  font-size: 0.95rem;
+  color: #379a93;
+  cursor: pointer;
+  transition: all 150ms ease-out;
+  padding: 0.25rem 0;
+  border-radius: 4px;
+}
+
+.card__route:hover,
+.card__location:hover {
+  text-decoration: underline;
+  background-color: rgba(70, 210, 196, 0.1);
+}
+
+.card__km {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #46d2c4;
+  margin: 0;
+}
+
+/* Light Gallery Overrides */
+.lg-outer {
+  z-index: 1000 !important;
+}
+
+.lg-item img {
+  border-radius: 0;
 }

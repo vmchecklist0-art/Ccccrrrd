@@ -3,16 +3,14 @@ new Vue({
   components: {
     'icon': { template: '<svg><use :xlink:href="use"/></svg>', props: ['use'] } },
 
-
   data() {
     return {
       modal: false,
-      companies: [],
+      items: [],
       dropdown: { height: 0 },
-      rating: { min: 10, max: 0 },
-      filters: { countries: {}, categories: {}, rating: 0 },
-      menus: { countries: false, categories: false, rating: false } };
-
+      filters: { routes: {}, locations: {}, kilometer: {} },
+      menus: { routes: false, locations: false, kilometer: false }
+    };
   },
 
   computed: {
@@ -21,25 +19,24 @@ new Vue({
     },
 
     list() {
-      let { countries, categories } = this.activeFilters;
+      let { routes, locations } = this.activeFilters;
 
-      return this.companies.filter(({ country, keywords, rating }) => {
-        if (rating < this.filters.rating) return false;
-        if (countries.length && !~countries.indexOf(country)) return false;
-        return !categories.length || categories.every(cat => ~keywords.indexOf(cat));
+      return this.items.filter(({ route, location }) => {
+        if (routes.length && !~routes.indexOf(route)) return false;
+        return !locations.length || locations.indexOf(location) !== -1;
       });
     },
 
     activeFilters() {
-      let { countries, categories } = this.filters;
+      let { routes, locations, kilometer } = this.filters;
 
       return {
-        countries: Object.keys(countries).filter(c => countries[c]),
-        categories: Object.keys(categories).filter(c => categories[c]),
-        rating: this.filters.rating > this.rating.min ? [this.filters.rating] : [] };
-
-    } },
-
+        routes: Object.keys(routes).filter(c => routes[c]),
+        locations: Object.keys(locations).filter(c => locations[c]),
+        kilometer: Object.keys(kilometer).filter(c => kilometer[c])
+      };
+    }
+  },
 
   watch: {
     activeMenu(index, from) {
@@ -52,69 +49,76 @@ new Vue({
           this.dropdown.height = `${this.$refs.menu[index].clientHeight + 16}px`;
         }
       });
-    } },
-
+    }
+  },
 
   methods: {
     setFilter(filter, option) {
-      if (filter === 'countries') {
-        this.filters[filter][option] = !this.filters[filter][option];
-      } else {
-        setTimeout(() => {
-          this.clearFilter(filter, option, this.filters[filter][option]);
-        }, 100);
-      }
+      this.filters[filter][option] = !this.filters[filter][option];
     },
 
     clearFilter(filter, except, active) {
-      if (filter === 'rating') {
-        this.filters[filter] = this.rating.min;
-      } else {
-        Object.keys(this.filters[filter]).forEach(option => {
-          this.filters[filter][option] = except === option && !active;
-        });
-      }
+      Object.keys(this.filters[filter]).forEach(option => {
+        this.filters[filter][option] = except === option && !active;
+      });
     },
 
     clearAllFilters() {
-      Object.keys(this.filters).forEach(this.clearFilter);
+      Object.keys(this.filters).forEach(filter => {
+        Object.keys(this.filters[filter]).forEach(option => {
+          this.filters[filter][option] = false;
+        });
+      });
     },
 
     setMenu(menu, active) {
       Object.keys(this.menus).forEach(tab => {
         this.menus[tab] = !active && tab === menu;
       });
-    } },
+    },
 
-
-  beforeMount() {
-    fetch('https://s3-us-west-2.amazonaws.com/s.cdpn.io/450744/mock-data.json').
-    then(response => response.json()).
-    then(companies => {
-      this.companies = companies;
-
-      companies.forEach(({ country, keywords, rating }) => {
-        this.$set(this.filters.countries, country, false);
-
-        if (this.rating.max < rating) this.rating.max = rating;
-        if (this.rating.min > rating) {
-          this.rating.min = rating;
-          this.filters.rating = rating;
-        }
-
-        keywords.forEach(category => {
-          this.$set(this.filters.categories, category, false);
+    initLightGallery() {
+      this.$nextTick(() => {
+        this.items.forEach(item => {
+          const galleryElement = document.getElementById('gallery-' + item.id);
+          if (galleryElement && !galleryElement.hasOwnProperty('lightGallery')) {
+            lightGallery(galleryElement, {
+              plugins: [lgThumbnail],
+              thumbnail: true,
+              selector: 'a',
+              speed: 300,
+              licenseKey: 'D4E2FA23-B7B211EE-8119E09E-4202FB86'
+            });
+          }
         });
       });
+    }
+  },
+
+  beforeMount() {
+    // Sample data with a single gallery card and one image
+    this.items = [
+      {
+        id: 1,
+        route: 'Alpine Pass',
+        location: 'Swiss Alps',
+        km: '12.3 Km',
+        images: [
+          { thumb: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=300&h=300&fit=crop', full: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&h=600&fit=crop', width: 800, height: 600, alt: 'Mountain View' }
+        ]
+      }
+    ];
+
+    // Initialize filters
+    this.items.forEach(({ route, location }) => {
+      this.$set(this.filters.routes, route, false);
+      this.$set(this.filters.locations, location, false);
     });
-  } });
 
+    this.initLightGallery();
+  },
 
-// inject svg spritesheet
-fetch('https://s3-us-west-2.amazonaws.com/s.cdpn.io/450744/mock-logos.svg').
-then(response => response.text()).then(sprite => {
-  let figure = document.createElement('figure');
-  figure.style.display = 'none';
-  figure.innerHTML = sprite;
-  document.body.insertBefore(figure, document.body.children[0]);
+  updated() {
+    this.initLightGallery();
+  }
 });

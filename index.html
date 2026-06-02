@@ -2,11 +2,19 @@
 <html lang="en" >
 <head>
   <meta charset="UTF-8">
-  <title>VueJS transition &amp; transition-group demo</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1"><link rel='stylesheet' href='https://fonts.googleapis.com/css?family=Nunito:200,300,400'><link rel="stylesheet" href="./style.css">
+  <title>Image Gallery with Lightgallery</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel='stylesheet' href='https://fonts.googleapis.com/css?family=Nunito:200,300,400'>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lightgallery@2.7.0/css/lightgallery.min.css">
+  <link rel="stylesheet" href="./style.css">
 
 </head>
 <body>
+<svg xmlns="http://www.w3.org/2000/svg" style="display:none;">
+  <symbol id="filter" viewBox="0 0 24 24">
+    <path d="M3 4h18l-7 8v6l-4 2v-8L3 4z" fill="currentColor"/>
+  </symbol>
+</svg>
 <!-- partial:index.partial.html -->
 <main id="app" class="content">
   <nav class="nav">
@@ -31,17 +39,7 @@
     <menu v-for="(options, filter) in filters" class="filters"
       v-show="menus[filter]" ref="menu" :key="filter">
 
-      <li v-if="filter === 'rating'" class="filters__rating">
-        <output>
-          <label>Minimum rating:&nbsp;</label>
-          {{ parseFloat(filters.rating).toFixed(1) }}
-        </output>
-
-        <input v-model="filters.rating" class="filters__range" type="range"
-          :min="rating.min" :max="rating.max" step="0.1"/>
-      </li>
-
-      <template v-else>
+      <template v-if="filter !== 'rating'">
         <li v-for="(active, option) in options" class="filters__item"
           :class="{ 'filters__item--active': active }"
           @click="setFilter(filter, option)">
@@ -51,28 +49,55 @@
     </menu>
   </transition-group>
 
-  <transition-group name="company" tag="ul" class="content__list">
-    <li class="company" v-for="company in list" :key="company.id">
-      <div class="company__info">
-        <icon class="company__logo" :style="`fill:${company.color}`" :use="company.logo"></icon>
-        <h2 class="company__name">{{ company.name }}</h2>
-        <blockquote class="company__slogan">{{ company.slogan }}</blockquote>
+  <transition-group name="card" tag="ul" class="content__list">
+    <li class="card" v-for="item in list" :key="item.id">
+      <div class="card__gallery-wrapper">
+        <div class="card__gallery-preview" @click="$event.currentTarget.nextElementSibling.querySelector('a').click()">
+          <img class="gallery__preview-image" :src="item.images[0].thumb" :alt="item.images[0].alt"/>
+          <div class="gallery__count-badge">{{ item.images.length }}</div>
+          <div class="gallery__overlay">
+          </div>
+        </div>
+        
+        <div class="card__gallery" :id="'gallery-' + item.id" style="display: none;">
+          <a v-for="(image, index) in item.images" :key="index" 
+             class="gallery__item"
+             :href="image.full"
+             :data-lg-size="image.width + '-' + image.height"
+             :data-src="image.full"
+             :data-thumb="image.thumb">
+            <img class="gallery__image" :src="image.thumb" :alt="image.alt"/>
+          </a>
+        </div>
+
       </div>
 
-      <ul class="company__details">
-        <li class="company__data">
-          <label class="company__label">Country</label>
-          <p class="company__country"
-            @click="clearFilter('countries', company.country)">
-            {{ company.country }}
-          </p>
-        </li>
+      <div class="card__details">
+        <div class="card__details-left">
+          <div class="card__data">
+            <label class="card__label">Route</label>
+            <p class="card__route"
+              @click="clearFilter('routes', item.route)">
+              {{ item.route }}
+            </p>
+          </div>
 
-        <li class="company__data">
-          <label class="company__label">Rating</label>
-          <p class="company__rating">{{ company.rating.toFixed(1) }}</p>
-        </li>
-      </ul>
+          <div class="card__data">
+            <label class="card__label">Location</label>
+            <p class="card__location"
+              @click="clearFilter('locations', item.location)">
+              {{ item.location }}
+            </p>
+          </div>
+        </div>
+
+        <div class="card__details-right">
+          <div class="card__distance">
+            <label class="card__label">Km</label>
+            <p class="card__km">{{ item.km }}</p>
+          </div>
+        </div>
+      </div>
     </li>
   </transition-group>
 
@@ -94,7 +119,10 @@
   </transition>
 </main>
 <!-- partial -->
-  <script src='https://cdnjs.cloudflare.com/ajax/libs/vue/2.3.4/vue.min.js'></script><script  src="./script.js"></script>
+  <script src='https://cdnjs.cloudflare.com/ajax/libs/vue/2.3.4/vue.min.js'></script>
+  <script src="https://cdn.jsdelivr.net/npm/lightgallery@2.7.0/lightgallery.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lightgallery@2.7.0/plugins/thumbnail/lg-thumbnail.umd.min.js"></script>
+  <script src="./script.js"></script>
 
 </body>
 </html>
